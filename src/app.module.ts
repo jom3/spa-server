@@ -3,6 +3,9 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { AnimalsModule } from './animals/animals.module';
+import { Animal } from './animals/entities/animal.entity';
+import { AnimalDetails } from './animals/entities/animal.details.entity';
 
 @Module({
   imports: [
@@ -14,13 +17,14 @@ import { join } from 'path';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASS,
       database: process.env.POSTGRES_DB,
-      entities: [],
+      entities: [Animal, AnimalDetails],
       synchronize: true,
       autoLoadEntities: true,
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
+    AnimalsModule
   ],
   controllers: [],
   providers: [],
