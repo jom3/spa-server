@@ -111,10 +111,6 @@ export class AnimalsService {
     if (error.code === '23505') {
       throw new BadRequestException('There is an animal with that name');
     }
-    // if(error.status===409){
-    //   throw new ConflictException('')
-    // }
-    console.log(error);
     throw new InternalServerErrorException('Contact with the ADMIN');
   }
 }
