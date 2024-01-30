@@ -1,10 +1,10 @@
-import { IsEnum, IsNumber} from "class-validator";
+import { IsEnum, IsString} from "class-validator";
 import { BornType } from "../entities/animal.details.entity";
 
 export class CreateAnimalDetailsDto {
 
-  @IsNumber()
-  maxAge:number;
+  @IsString()
+  maxAge:string;
 
   @IsEnum(BornType)
   bornBy:BornType;

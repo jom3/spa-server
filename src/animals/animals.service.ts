@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateAnimalDto } from './dto/create-animal.dto';
 import { UpdateAnimalDto } from './dto/update-animal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,92 +18,103 @@ export class AnimalsService {
     @InjectRepository(Animal)
     private readonly animalRepository: Repository<Animal>,
     @InjectRepository(AnimalDetails)
-    private readonly animalDetailsRepository: Repository<AnimalDetails>
+    private readonly animalDetailsRepository: Repository<AnimalDetails>,
   ) {}
-  async create(createAnimalDto: CreateAnimalDto) {
+  async create(createAnimalDto: CreateAnimalDto, file?: Express.Multer.File) {
     const { bornBy, maxAge, ...toCreate } = createAnimalDto;
     try {
-      const animal = this.animalRepository.create(toCreate);
-      await this.animalRepository
-        .save(animal)
-        .then(
-          async (animal) =>
-            await this.animalDetailsRepository.save(
-              this.animalDetailsRepository.create({
-                bornBy,
-                maxAge,
-                animalDetailId: animal.animalId,
-              }),
-            ),
-        );
-      return 'Animal created'
+      const animal = this.animalRepository.create({
+        image: `${file ? file.filename : null}`,
+        ...toCreate,
+      });
+      await this.animalRepository.save(animal).then(
+        async (animal) =>
+          await this.animalDetailsRepository.save(
+            this.animalDetailsRepository.create({
+              bornBy,
+              maxAge: +maxAge,
+              animalDetailId: animal.animalId,
+            }),
+          ),
+      );
+      return 'Animal created';
     } catch (error) {
-      this.handleError(error)
+      this.handleError(error);
     }
   }
 
-  async findAll(paginationDto:PaginationDto) {
-    const {limit=10, offset=0} = paginationDto;
+  async findAll(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
     const animals = await this.animalRepository.find({
-      take:limit,
-      skip:offset
+      take: limit,
+      skip: offset,
     });
     return animals;
   }
 
   async findOne(id: string) {
-    const animal = await this.animalRepository.findOneBy({animalId:id})
-    if(!animal){
-      throw new NotFoundException(`There is not an animal with ID: ${id}`)
+    const animal = await this.animalRepository.findOneBy({ animalId: id });
+    if (!animal) {
+      throw new NotFoundException(`There is not an animal with ID: ${id}`);
     }
     return animal;
   }
 
   async findOneByName(name: string) {
-    const animal = await this.animalRepository.findOneBy({name})
-    if(!animal){
-      throw new NotFoundException(`There is not an animal with name: ${name}`)
+    const animal = await this.animalRepository.findOneBy({ name });
+    if (!animal) {
+      throw new NotFoundException(`There is not an animal with name: ${name}`);
     }
     return animal;
   }
 
   async update(id: string, updateAnimalDto: UpdateAnimalDto) {
-    const {bornBy,maxAge, ...toUpdate} = updateAnimalDto;
+    const { bornBy, maxAge, ...toUpdate } = updateAnimalDto;
     try {
       const animal = await this.animalRepository.preload({
-        animalId:id,
-        ...toUpdate
-      })
-      if(!animal) throw new NotFoundException(`There is not an animal with ID: ${id}`)
-      
-      if(bornBy || maxAge) {
-        const animalDetail = await this.animalDetailsRepository.preload({animalDetailId:id, bornBy, maxAge})
-          if(!animalDetail) throw new NotFoundException(`There is not an animal with ID: ${id}`)
+        animalId: id,
+        ...toUpdate,
+      });
+      if (!animal)
+        throw new NotFoundException(`There is not an animal with ID: ${id}`);
+
+      if (bornBy || maxAge) {
+        const animalDetail = await this.animalDetailsRepository.preload({
+          animalDetailId: id,
+          bornBy,
+          maxAge: +maxAge,
+        });
+        if (!animalDetail)
+          throw new NotFoundException(`There is not an animal with ID: ${id}`);
         await this.animalDetailsRepository.save(animalDetail);
       }
-      await this.animalRepository.save(animal)
+      await this.animalRepository.save(animal);
     } catch (error) {
-      this.handleError(error)
+      this.handleError(error);
     }
     return `The animal was updated`;
   }
 
   async remove(id: string) {
-    await this.findOne(id)
-    await this.animalRepository.update({animalId:id},{isActive:false})
+    await this.findOne(id);
+    await this.animalRepository.update({ animalId: id }, { isActive: false });
     return `The animal was deleted`;
   }
 
   async restore(id: string) {
-    await this.findOne(id)
-    await this.animalRepository.update({animalId:id},{isActive:true})
+    await this.findOne(id);
+    await this.animalRepository.update({ animalId: id }, { isActive: true });
     return `The animal was restored`;
   }
 
-  private handleError(error:any){
-    if(error.code==='23505'){
-      throw new BadRequestException('There is an animal with that name')
+  private handleError(error: any) {
+    if (error.code === '23505') {
+      throw new BadRequestException('There is an animal with that name');
     }
-    throw new InternalServerErrorException('Contact with the ADMIN')
+    // if(error.status===409){
+    //   throw new ConflictException('')
+    // }
+    console.log(error);
+    throw new InternalServerErrorException('Contact with the ADMIN');
   }
 }
