@@ -12,6 +12,8 @@ import { Repository } from 'typeorm';
 import { AnimalDetails } from './entities/animal.details.entity';
 import { PaginationDto } from 'src/shared/dtos/pagination.dto';
 import * as fs from 'fs';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
 @Injectable()
 export class AnimalsService {
@@ -51,6 +53,14 @@ export class AnimalsService {
       skip: offset,
     });
     return animals;
+  }
+
+  findAnimalImage(animalFile:string){
+    const path = join(__dirname, '../../static/animal', animalFile)
+    if(!existsSync(path)){
+      throw new BadRequestException(`No animal file found with name ${animalFile}`)
+    }
+    return path
   }
 
   async findOne(id: string) {

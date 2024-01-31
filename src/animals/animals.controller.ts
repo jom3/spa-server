@@ -10,6 +10,8 @@ import {
   ParseUUIDPipe,
   UploadedFile,
   UseInterceptors,
+  Header,
+  StreamableFile,
 } from '@nestjs/common';
 import { AnimalsService } from './animals.service';
 import { CreateAnimalDto } from './dto/create-animal.dto';
@@ -19,6 +21,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { fileNamer } from 'src/shared/helpers/fileNamer.helper';
 import { fileFilter } from 'src/shared/helpers/fileFilter.helper';
+import { createReadStream } from 'fs';
 
 
 export const multerOptions = {
@@ -48,6 +51,13 @@ export class AnimalsController {
   @Get()
   findAll(@Query() paginationDto: PaginationDto) {
     return this.animalsService.findAll(paginationDto);
+  }
+
+  @Get('file/:animalFile')
+  @Header('Content-Type', 'image/jpeg')
+  findAnimalImage(@Param('animalFile') animalFile:string){
+    const stream = createReadStream(this.animalsService.findAnimalImage(animalFile));
+    return new StreamableFile(stream)
   }
 
   @Get(':id')
