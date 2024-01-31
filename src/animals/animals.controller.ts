@@ -61,11 +61,15 @@ export class AnimalsController {
   }
 
   @Patch('update/:id')
+  @UseInterceptors(
+    FileInterceptor('file', multerOptions),
+  )
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateAnimalDto: UpdateAnimalDto,
+    @UploadedFile() file: Express.Multer.File
   ) {
-    return this.animalsService.update(id, updateAnimalDto);
+    return this.animalsService.update(id, updateAnimalDto, file);
   }
 
   @Delete('remove/:id')

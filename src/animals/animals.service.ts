@@ -11,6 +11,7 @@ import { Animal } from './entities/animal.entity';
 import { Repository } from 'typeorm';
 import { AnimalDetails } from './entities/animal.details.entity';
 import { PaginationDto } from 'src/shared/dtos/pagination.dto';
+import * as fs from 'fs';
 
 @Injectable()
 export class AnimalsService {
@@ -68,11 +69,24 @@ export class AnimalsService {
     return animal;
   }
 
-  async update(id: string, updateAnimalDto: UpdateAnimalDto) {
+  async update(
+    id: string,
+    updateAnimalDto: UpdateAnimalDto,
+    file?: Express.Multer.File,
+  ) {
     const { bornBy, maxAge, ...toUpdate } = updateAnimalDto;
+    const animalData = await this.findOne(id);
+    if (file) {
+      try {
+        fs.unlinkSync('static' + `/animal/${animalData.image}`);
+      } catch (error) {
+        throw new BadRequestException('file could not be deleted');
+      }
+    }
     try {
       const animal = await this.animalRepository.preload({
         animalId: id,
+        image: `${file ? file.filename : animalData.image}`,
         ...toUpdate,
       });
       if (!animal)
