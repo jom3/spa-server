@@ -6,6 +6,9 @@ import { join } from 'path';
 import { AnimalsModule } from './animals/animals.module';
 import { Animal } from './animals/entities/animal.entity';
 import { AnimalDetails } from './animals/entities/animal.details.entity';
+import { UserModule } from './user/user.module';
+import { User } from './user/entities/user.entity';
+import { UserDetails } from './user/entities/user-details.entity';
 
 @Module({
   imports: [
@@ -17,14 +20,15 @@ import { AnimalDetails } from './animals/entities/animal.details.entity';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASS,
       database: process.env.POSTGRES_DB,
-      entities: [Animal, AnimalDetails],
+      entities: [Animal, AnimalDetails, User, UserDetails],
       synchronize: true,
       autoLoadEntities: true,
     }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
-    AnimalsModule
+    AnimalsModule,
+    UserModule
   ],
   controllers: [],
   providers: [],
