@@ -1,5 +1,6 @@
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserDetails } from './user-details.entity';
+import { Auth } from 'src/auth/entities/auth.entity';
 
 export enum userRole {
   USER = 'user',
@@ -32,4 +33,6 @@ export class User {
     eager:true, cascade:true
   })
   userDetails: UserDetails;
+  @OneToOne(() => Auth, (auth) => auth.user)
+  auth: Auth
 }
