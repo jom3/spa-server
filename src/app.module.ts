@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
@@ -9,6 +9,8 @@ import { AnimalDetails } from './animals/entities/animal.details.entity';
 import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
 import { UserDetails } from './user/entities/user-details.entity';
+import { AuthModule } from './auth/auth.module';
+import { Auth } from './auth/entities/auth.entity';
 
 @Module({
   imports: [
@@ -20,7 +22,7 @@ import { UserDetails } from './user/entities/user-details.entity';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASS,
       database: process.env.POSTGRES_DB,
-      entities: [Animal, AnimalDetails, User, UserDetails],
+      entities: [Animal, AnimalDetails, User, UserDetails, Auth],
       synchronize: true,
       autoLoadEntities: true,
     }),
@@ -28,9 +30,10 @@ import { UserDetails } from './user/entities/user-details.entity';
       rootPath: join(__dirname, '..', 'public'),
     }),
     AnimalsModule,
-    UserModule
+    UserModule,
+    AuthModule
   ],
   controllers: [],
-  providers: [],
+  providers: [ConfigService],
 })
 export class AppModule {}
