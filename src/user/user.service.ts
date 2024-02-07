@@ -14,6 +14,11 @@ import { PaginationDto } from '../shared/dtos/pagination.dto';
 import { join } from 'path';
 import { existsSync } from 'fs';
 import * as fs from 'fs';
+import { Auth } from 'src/auth/entities/auth.entity';
+import { passwordGenerator } from 'src/shared/helpers/passwordGenerator.helper';
+import { encryptPassword } from 'src/shared/helpers/encryptPassword.helper';
+import { sendEmail } from 'src/shared/helpers/sendEmail.helper';
+import { ReasonType, generateMessage } from 'src/shared/helpers/generateMessage.helper';
 
 @Injectable()
 export class UserService {
@@ -22,6 +27,8 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserDetails)
     private readonly userDetailsRepository: Repository<UserDetails>,
+    @InjectRepository(Auth)
+    private readonly authRepository: Repository<Auth>,
   ) {}
 
   async create(createUserDto: CreateUserDto, file?: Express.Multer.File) {
@@ -31,17 +38,29 @@ export class UserService {
         photo: `${file ? file.filename : null}`,
         ...toCreate,
       });
-      await this.userRepository.save(user).then(async (user) => {
-        await this.userDetailsRepository.save(
-          this.userDetailsRepository.create({
+      await this.userRepository
+        .save(user)
+        .then(async (user) => {
+          const generatedPassword = passwordGenerator();
+          const encryptedPassword = await encryptPassword(generatedPassword);
+          await this.userDetailsRepository.save(
+            this.userDetailsRepository.create({
+              userId: user.userId,
+              address1,
+              address2,
+              city,
+              telephone,
+            }),
+          );
+          await this.authRepository.save(this.authRepository.create({
+            password:encryptedPassword,
+            email: user.email,
             userId: user.userId,
-            address1,
-            address2,
-            city,
-            telephone,
-          }),
-        );
-      });
+          })).then(async()=>{
+            const message = generateMessage(user.email, ReasonType.NEW, generatedPassword);
+            await sendEmail(user.email, message);
+          })
+        })
       return 'New user created';
     } catch (error) {
       this.handleError(error);
@@ -127,6 +146,7 @@ export class UserService {
     if (error.code === '23505') {
       throw new BadRequestException(error.detail);
     }
+    console.log(error)
     throw new InternalServerErrorException('Contact with the ADMIN');
   }
 }
