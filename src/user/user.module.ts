@@ -7,10 +7,11 @@ import { UserDetails } from './entities/user-details.entity';
 import { Auth } from 'src/auth/entities/auth.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { AttentionDetail } from 'src/attention/attention/entities/attention-detail.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([User,UserDetails, Auth]),
+    TypeOrmModule.forFeature([User,UserDetails, Auth, AttentionDetail]),
     JwtModule
   ],
   controllers: [UserController],
