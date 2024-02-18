@@ -11,6 +11,10 @@ import { User } from './user/entities/user.entity';
 import { UserDetails } from './user/entities/user-details.entity';
 import { AuthModule } from './auth/auth.module';
 import { Auth } from './auth/entities/auth.entity';
+import { AttentionsModule } from './attention/attentions.module';
+import { AttentionType } from './attention/attention-type/entities/attention-type.entity';
+import { Attention } from './attention/attention/entities/attention.entity';
+import { AttentionDetail } from './attention/attention/entities/attention-detail.entity';
 
 @Module({
   imports: [
@@ -22,7 +26,7 @@ import { Auth } from './auth/entities/auth.entity';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASS,
       database: process.env.POSTGRES_DB,
-      entities: [Animal, AnimalDetails, User, UserDetails, Auth],
+      entities: [Animal, AnimalDetails, User, UserDetails, Auth, AttentionType, Attention, AttentionDetail],
       synchronize: true,
       autoLoadEntities: true,
     }),
@@ -31,7 +35,8 @@ import { Auth } from './auth/entities/auth.entity';
     }),
     AnimalsModule,
     UserModule,
-    AuthModule
+    AuthModule,
+    AttentionsModule,
   ],
   controllers: [],
   providers: [ConfigService],
