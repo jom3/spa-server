@@ -1,6 +1,7 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserDetails } from './user-details.entity';
 import { Auth } from 'src/auth/entities/auth.entity';
+import { AttentionDetail } from 'src/attention/attention/entities/attention-detail.entity';
 
 export enum userRole {
   USER = 'user',
@@ -29,10 +30,15 @@ export class User {
   role: userRole[];
   @Column({ type: 'boolean', default: true })
   status: boolean;
+  
   @OneToOne(() => UserDetails, (userDetails) => userDetails.user,{
     eager:true, cascade:true
   })
   userDetails: UserDetails;
+
   @OneToOne(() => Auth, (auth) => auth.user)
   auth: Auth
+
+  @OneToMany(()=>AttentionDetail, (attentionDetail)=>attentionDetail.user)
+  attentionDetail:AttentionDetail
 }
