@@ -1,5 +1,6 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { AnimalDetails } from './animal.details.entity';
+import { Attention } from "src/attention/attention/entities/attention.entity";
 
 export enum AnimalType{
   FISH = 'fish',
@@ -36,4 +37,7 @@ export class Animal {
     eager:true, cascade:true
   })
   animalDetails:AnimalDetails
+
+  @OneToMany(()=>Attention,(attention)=>attention.animal)
+  attention:Attention
 }
