@@ -53,6 +53,11 @@ export class AnimalsController {
     return this.animalsService.findAll(paginationDto);
   }
 
+  @Get('allAdoptables')
+  findAllAdoptables(@Query() paginationDto: PaginationDto) {
+    return this.animalsService.findAllAdoptables(paginationDto);
+  }
+
   @Get('file/:animalFile')
   @Header('Content-Type', 'image/jpeg')
   findAnimalImage(@Param('animalFile') animalFile:string){

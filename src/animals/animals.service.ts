@@ -55,6 +55,16 @@ export class AnimalsService {
     return animals;
   }
 
+  async findAllAdoptables(paginationDto: PaginationDto) {
+    const { limit = 10, offset = 0 } = paginationDto;
+    const animals = await this.animalRepository.find({
+      take: limit,
+      skip: offset,
+      where:{isAdoptable:true}
+    });
+    return animals;
+  }
+
   findAnimalImage(animalFile:string){
     const path = join(__dirname, '../../static/animal', animalFile)
     if(!existsSync(path)){

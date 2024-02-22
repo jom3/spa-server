@@ -22,6 +22,9 @@ export class Animal {
   image:string;
 
   @Column({type:'boolean', default:false})
+  isAdoptable:boolean;
+
+  @Column({type:'boolean', default:false})
   isExtinct:boolean;
 
   @Column({type:'boolean', default:true})
