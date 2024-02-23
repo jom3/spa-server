@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typ
 import { UserDetails } from './user-details.entity';
 import { Auth } from 'src/auth/entities/auth.entity';
 import { AttentionDetail } from 'src/attention/attention/entities/attention-detail.entity';
+import { Adopt } from 'src/adopt/entities/adopt.entity';
 
 export enum userRole {
   USER = 'user',
@@ -41,4 +42,7 @@ export class User {
 
   @OneToMany(()=>AttentionDetail, (attentionDetail)=>attentionDetail.user)
   attentionDetail:AttentionDetail
+
+  @OneToMany(()=>Adopt,(adopt)=>adopt.user)
+  adopt:Adopt
 }
