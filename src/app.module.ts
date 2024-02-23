@@ -15,6 +15,9 @@ import { AttentionsModule } from './attention/attentions.module';
 import { AttentionType } from './attention/attention-type/entities/attention-type.entity';
 import { Attention } from './attention/attention/entities/attention.entity';
 import { AttentionDetail } from './attention/attention/entities/attention-detail.entity';
+import { AdoptModule } from './adopt/adopt.module';
+import { Adopt } from './adopt/entities/adopt.entity';
+import { AdoptControl } from './adopt/entities/adopt-control.entity';
 
 @Module({
   imports: [
@@ -26,7 +29,18 @@ import { AttentionDetail } from './attention/attention/entities/attention-detail
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASS,
       database: process.env.POSTGRES_DB,
-      entities: [Animal, AnimalDetails, User, UserDetails, Auth, AttentionType, Attention, AttentionDetail],
+      entities: [
+        Adopt,
+        AdoptControl,
+        Animal,
+        AnimalDetails,
+        Attention,
+        AttentionDetail,
+        AttentionType,
+        Auth,
+        User,
+        UserDetails,
+      ],
       synchronize: true,
       autoLoadEntities: true,
     }),
@@ -37,6 +51,7 @@ import { AttentionDetail } from './attention/attention/entities/attention-detail
     UserModule,
     AuthModule,
     AttentionsModule,
+    AdoptModule,
   ],
   controllers: [],
   providers: [ConfigService],
