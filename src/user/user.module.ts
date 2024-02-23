@@ -8,10 +8,11 @@ import { Auth } from 'src/auth/entities/auth.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AttentionDetail } from 'src/attention/attention/entities/attention-detail.entity';
+import { Adopt } from 'src/adopt/entities/adopt.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([User,UserDetails, Auth, AttentionDetail]),
+    TypeOrmModule.forFeature([User,UserDetails, Auth, AttentionDetail,Adopt]),
     JwtModule
   ],
   controllers: [UserController],
